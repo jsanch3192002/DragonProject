@@ -44,7 +44,7 @@ fetch("dragon_path.json")
 
 const loader=new GLTFLoader();
 
-loader.load(loader.load('https://drive.google.com/uc?export=download&id=1xGwjeeXavnMlFOHKl5YWj7e07MBwdnwT', ...
+loader.load('https://drive.google.com/uc?export=download&id=1xGwjeeXavnMlFOHKl5YWj7e07MBwdnwT', ...
     
 
     (gltf)=>{
