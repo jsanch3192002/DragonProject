@@ -75,12 +75,23 @@ loader.load(
     );
 
 },
-
-(error)=>{
+(error) => {
 
     console.error(error);
 
-    alert("Dragon failed to load.");
+    document.body.innerHTML = `
+    <div style="
+        background:black;
+        color:red;
+        font-size:24px;
+        padding:20px;
+        font-family:Arial;
+    ">
+        <h2>Dragon failed to load</h2>
+        <pre>${error.message || JSON.stringify(error,null,2)}</pre>
+    </div>`;
+
+}
 
 }
 
