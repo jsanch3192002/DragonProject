@@ -44,7 +44,12 @@ fetch("dragon_path.json")
 
 const loader=new GLTFLoader();
 
-loader.load('https://drive.google.com/uc?export=download&id=1xGwjeeXavnMlFOHKl5YWj7e07MBwdnwT', ...
+loader.load(
+'https://github.com/jsanch3192002/DragonProject/releases/download/V1.0/chinese_dragon.glb',
+(gltf)=>{
+    scene.add(gltf.scene);
+}
+);
     
 
     (gltf)=>{
