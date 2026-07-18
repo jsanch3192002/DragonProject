@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>RGB Dragon</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="stage"></div>
+
+  <button id="toggleUI" aria-label="Show or hide controls">⚙️</button>
+
+  <section id="panel">
+    <div class="panelTop">
+      <strong>RGB Dragon</strong>
+      <button id="reset">Reset</button>
+    </div>
+
+    <label>Preset
+      <select id="preset">
+        <option value="still">Still</option>
+        <option value="sweep">Reference sweep</option>
+        <option value="float">Slow float</option>
+      </select>
+    </label>
+
+    <label>Size <span id="scaleOut"></span>
+      <input id="scale" type="range" min=".35" max="2.5" step=".01" value="1">
+    </label>
+
+    <label>Zoom <span id="zoomOut"></span>
+      <input id="zoom" type="range" min="3" max="14" step=".1" value="7">
+    </label>
+
+    <label>X position <span id="xOut"></span>
+      <input id="x" type="range" min="-5" max="5" step=".01" value="0">
+    </label>
+
+    <label>Y position <span id="yOut"></span>
+      <input id="y" type="range" min="-5" max="5" step=".01" value="0">
+    </label>
+
+    <label>Motion speed <span id="speedOut"></span>
+      <input id="speed" type="range" min="0" max="2" step=".01" value=".7">
+    </label>
+
+    <label>Body RGB speed <span id="rgbSpeedOut"></span>
+      <input id="rgbSpeed" type="range" min="0" max="2" step=".01" value=".55">
+    </label>
+
+    <label>Body glow <span id="bodyGlowOut"></span>
+      <input id="bodyGlow" type="range" min="0" max="4" step=".01" value="1.1">
+    </label>
+
+    <label>Eye glow <span id="eyeGlowOut"></span>
+      <input id="eyeGlow" type="range" min="0" max="12" step=".1" value="7">
+    </label>
+
+    <label>Eye color
+      <input id="eyeColor" type="color" value="#ff2a00">
+    </label>
+
+    <label>Background
+      <input id="bgColor" type="color" value="#00ff00">
+    </label>
+
+    <div class="checks">
+      <label><input id="bodyRGB" type="checkbox" checked> RGB body</label>
+      <label><input id="eyeRGB" type="checkbox"> RGB eyes</label>
+      <label><input id="eyePulse" type="checkbox" checked> Eye pulse</label>
+      <label><input id="pause" type="checkbox"> Pause motion</label>
+    </div>
+
+    <p id="status">Loading dragon…</p>
+  </section>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
