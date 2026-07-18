@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#00ff00" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Galaxy Dragon</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --panel: rgba(9, 11, 24, .82);
+      --line: rgba(255,255,255,.14);
+      --text: #f7f8ff;
+      --muted: #b9bdd2;
+      --accent: #a88cff;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #00ff00;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      touch-action: none;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    #loading {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      z-index: 50;
+      background: #00ff00;
+      color: #061006;
+      font-weight: 800;
+      letter-spacing: .02em;
+      text-align: center;
+      padding: 28px;
+    }
+
+    #loading.hidden { display: none; }
+
+    #error {
+      display: none;
+      position: fixed;
+      left: 16px;
+      right: 16px;
+      top: max(16px, env(safe-area-inset-top));
+      z-index: 80;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(95, 0, 15, .92);
+      color: white;
+      font-size: 14px;
+      line-height: 1.35;
+      box-shadow: 0 12px 40px rgba(0,0,0,.35);
+    }
+
+    #panel {
+      position: fixed;
+      z-index: 30;
+      top: max(12px, env(safe-area-inset-top));
+      right: 12px;
+      width: min(340px, calc(100vw - 24px));
+      max-height: calc(100vh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+      overflow: auto;
+      overscroll-behavior: contain;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      color: var(--text);
+      backdrop-filter: blur(18px) saturate(1.25);
+      -webkit-backdrop-filter: blur(18px) saturate(1.25);
+      box-shadow: 0 16px 60px rgba(0,0,0,.32);
+      transition: opacity .2s ease, transform .2s ease;
+      touch-action: pan-y;
+    }
+
+    body.ui-hidden #panel {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(18px);
+    }
+
+    #showUi {
+      display: none;
+      position: fixed;
+      z-index: 31;
+      top: max(12px, env(safe-area-inset-top));
+      right: 12px;
+      width: 48px;
+      height: 48px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 50%;
+      background: rgba(10,10,22,.68);
+      color: white;
+      font-size: 20px;
+      backdrop-filter: blur(12px);
+    }
+
+    body.ui-hidden #showUi { display: block; }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .title-row h1 {
+      flex: 1;
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.1;
+    }
+
+    .small {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .section {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .section h2 {
+      margin: 0 0 9px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: #dadcf0;
+    }
+
+    .control {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px 12px;
+      align-items: center;
+      margin: 10px 0;
+    }
+
+    .control label {
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .value {
+      min-width: 54px;
+      text-align: right;
+      color: var(--muted);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .control input[type="range"] {
+      grid-column: 1 / -1;
+      width: 100%;
+      margin: 0;
+      accent-color: var(--accent);
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+
+    input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--accent);
+    }
+
+    input[type="color"] {
+      width: 54px;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: transparent;
+      padding: 2px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 12px;
+    }
+
+    button {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255,255,255,.10);
+      color: white;
+      font: inherit;
+      font-weight: 700;
+    }
+
+    button:active { transform: scale(.98); }
+
+    #status {
+      position: fixed;
+      z-index: 20;
+      left: 12px;
+      bottom: max(12px, env(safe-area-inset-bottom));
+      max-width: calc(100vw - 24px);
+      padding: 8px 11px;
+      border-radius: 10px;
+      background: rgba(0,0,0,.48);
+      color: white;
+      font-size: 12px;
+      pointer-events: none;
+      backdrop-filter: blur(8px);
+    }
+
+    body.ui-hidden #status { display: none; }
+
+    @media (max-width: 650px) {
+      #panel {
+        width: min(320px, calc(100vw - 20px));
+        right: 10px;
+        top: max(10px, env(safe-area-inset-top));
+      }
+    }
+  </style>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+
+<body>
+  <div id="loading">Loading Galaxy Dragon…<br><small>This model is large, so the first load may take a moment.</small></div>
+  <div id="error"></div>
+
+  <div id="panel">
+    <div class="title-row">
+      <h1>🌌 Galaxy Dragon</h1>
+      <button id="hideUi" aria-label="Hide settings">Hide</button>
+    </div>
+    <p class="small">Drag to orbit. Pinch to zoom. Your settings save automatically on this device.</p>
+
+    <div class="section">
+      <h2>Galaxy</h2>
+
+      <div class="toggle">
+        <label for="galaxyEnabled">Galaxy effect</label>
+        <input id="galaxyEnabled" type="checkbox" checked>
+      </div>
+
+      <div class="control">
+        <label for="colorSpeed">Color speed</label>
+        <span class="value" id="colorSpeedValue"></span>
+        <input id="colorSpeed" type="range" min="0" max="1.5" step="0.01">
+      </div>
+
+      <div class="control">
+        <label for="bodyGlow">Body glow</label>
+        <span class="value" id="bodyGlowValue"></span>
+        <input id="bodyGlow" type="range" min="0" max="8" step="0.1">
+      </div>
+
+      <div class="control">
+        <label for="starDensity">Star density</label>
+        <span class="value" id="starDensityValue"></span>
+        <input id="starDensity" type="range" min="80" max="1200" step="20">
+      </div>
+
+      <div class="control">
+        <label for="particleSize">Star size</label>
+        <span class="value" id="particleSizeValue"></span>
+        <input id="particleSize" type="range" min="0.005" max="0.08" step="0.001">
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Eyes</h2>
+
+      <div class="toggle">
+        <label for="eyeRgb">Eye RGB cycle</label>
+        <input id="eyeRgb" type="checkbox" checked>
+      </div>
+
+      <div class="control">
+        <label for="eyeGlow">Eye glow</label>
+        <span class="value" id="eyeGlowValue"></span>
+        <input id="eyeGlow" type="range" min="0" max="14" step="0.1">
+      </div>
+
+      <div class="control">
+        <label for="eyeColor">Static eye color</label>
+        <input id="eyeColor" type="color">
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Motion</h2>
+
+      <div class="toggle">
+        <label for="autoFlight">Cinematic flight</label>
+        <input id="autoFlight" type="checkbox" checked>
+      </div>
+
+      <div class="control">
+        <label for="flightSpeed">Flight speed</label>
+        <span class="value" id="flightSpeedValue"></span>
+        <input id="flightSpeed" type="range" min="0" max="2" step="0.01">
+      </div>
+
+      <div class="control">
+        <label for="floatAmount">Float amount</label>
+        <span class="value" id="floatAmountValue"></span>
+        <input id="floatAmount" type="range" min="0" max="1.5" step="0.01">
+      </div>
+
+      <div class="control">
+        <label for="dragonScale">Dragon size</label>
+        <span class="value" id="dragonScaleValue"></span>
+        <input id="dragonScale" type="range" min="0.5" max="3" step="0.01">
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Camera & Light</h2>
+
+      <div class="control">
+        <label for="cameraDistance">Camera distance</label>
+        <span class="value" id="cameraDistanceValue"></span>
+        <input id="cameraDistance" type="range" min="1.2" max="12" step="0.05">
+      </div>
+
+      <div class="control">
+        <label for="bloom">Bloom</label>
+        <span class="value" id="bloomValue"></span>
+        <input id="bloom" type="range" min="0" max="4" step="0.05">
+      </div>
+
+      <div class="control">
+        <label for="exposure">Exposure</label>
+        <span class="value" id="exposureValue"></span>
+        <input id="exposure" type="range" min="0.2" max="2.5" step="0.05">
+      </div>
+
+      <div class="control">
+        <label for="background">Green-screen color</label>
+        <input id="background" type="color">
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button id="resetCamera">Reset camera</button>
+      <button id="resetAll">Reset all</button>
+      <button id="fullscreen">Full screen</button>
+      <button id="pause">Pause</button>
+    </div>
+  </div>
+
+  <button id="showUi" aria-label="Show settings">⚙️</button>
+  <div id="status">Preparing scene…</div>
+
+  <script type="module" src="./main.js?v=cinematic-2"></script>
+</body>
+</html>
