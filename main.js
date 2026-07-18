@@ -5,8 +5,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-const MODEL_URL =
-  'https://www.dropbox.com/scl/fi/ptu2nxi0rvd6e6anl08ep/chinese_dragon.glb?rlkey=7hbz1m4asxec3j0ut5xmm3giz&raw=1';
+const MODEL_URL = './chinese_dragon.glb';
 
 const STORAGE_KEY = 'galaxyDragonSettingsV1';
 
